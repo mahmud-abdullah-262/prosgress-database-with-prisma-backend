@@ -1,13 +1,14 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import prisma from './lib/prisma';
+
 import { toNodeHandler } from 'better-auth/node';
 import { fromNodeHeaders } from 'better-auth/node';
 import { auth } from './lib/auth';
 
 
-dotenv.config();
+
 
 const app = express();
 app.use(cors({
