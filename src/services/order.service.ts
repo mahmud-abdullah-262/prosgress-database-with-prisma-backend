@@ -1,4 +1,5 @@
-import { prisma, OrderStatus } from '../lib/prisma';
+import { prisma } from '../lib/prisma';
+import { OrderStatus } from '@prisma/client';
 
 export const orderService = {
   create: async (userId: string, items: { productId: string; quantity: number; price: number }[]) => {

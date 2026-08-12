@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import { successResponse, errorResponse } from '../utils/apiResponse';
 import { asyncHandler, AppError } from '../middlewares/errorHandler';
-import { userService, hashPassword, comparePassword } from '../services/user.service';
+import { prisma, hashPassword, comparePassword } from '../services/user.service';
 import { authenticate } from '../middlewares/auth';
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const { name, email, password, role } = req.body;
 
-  const existingUser = await userService.prisma.user.findUnique({
+  const existingUser = await prisma.user.findUnique({
     where: { email },
   });
 
@@ -17,7 +17,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 
   const hashedPassword = await hashPassword(password);
 
-  const user = await userService.prisma.user.create({
+  const user = await prisma.user.create({
     data: {
       name,
       email,
@@ -39,7 +39,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
-  const user = await userService.prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { email, isDeleted: false },
   });
 
@@ -59,7 +59,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const getProfile = asyncHandler(async (req: Request, res: Response) => {
-  const user = await userService.prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { id: req.user!.id, isDeleted: false },
     select: {
       id: true,
@@ -84,7 +84,7 @@ export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
   const skip = (page - 1) * limit;
 
   const [users, total] = await Promise.all([
-    userService.prisma.user.findMany({
+    prisma.user.findMany({
       where: { isDeleted: false },
       select: {
         id: true,
@@ -98,7 +98,7 @@ export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
       take: limit,
       orderBy: { createdAt: 'desc' },
     }),
-    userService.prisma.user.count({
+    prisma.user.count({
       where: { isDeleted: false },
     }),
   ]);
